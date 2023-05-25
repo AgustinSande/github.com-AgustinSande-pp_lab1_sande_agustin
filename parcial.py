@@ -55,18 +55,15 @@ def guardar_archivo_csv_estadisticas(nombre_archivo : str, jugador : dict):
     '''
     try:
         with open(nombre_archivo, "w", encoding= "utf-8") as archivo:
+                
+                
                 texto_linea = ""
-                lista_valores = estadisticas_un_jugador(jugador)
-                for valor in lista_valores:
+                
+                for clave, valor in jugador.items():
                     
                         
-                    texto_linea += "{0}\n".format(valor)
-                    if valor == lista_valores[2]:
-                        for estadisticas in lista_valores[2]:
-                            texto_linea += "{0}\n".format(lista_valores[2][estadisticas])
-                    if valor == lista_valores[3] :
-                        for logros in lista_valores[3]:
-                            texto_linea += "{0}\n".format(lista_valores[3][logros])
+                    texto_linea += "{0}:{1}\n".format(clave.capitalize(), valor)
+                    
                 archivo.write(texto_linea)
         return True
     
@@ -157,9 +154,10 @@ def mostrar_estadisticas_un_jugador(lista_jugadores : list, indice_ingresado : i
         
         for jugador in lista_jugadores:
             if jugador == lista_jugadores[indice_ingresado - 1]:
-                print("\n\nLogros de {0}".format(jugador["nombre"]))
-                for logro in jugador["logros"]:
-                    print("-",logro)
+                print("\n\nEstadisticas de {0}".format(jugador["nombre"]))
+                for clave, valor in jugador["estadisticas"].items():
+
+                        print("{0}: {1}".format(clave, valor))
                     
 
         return True
@@ -168,8 +166,82 @@ def mostrar_estadisticas_un_jugador(lista_jugadores : list, indice_ingresado : i
         return False
     
     
+def calcular_mostrar_promedio_puntos_por_partido_equipo(lista_jugadores : list):
+    
+    if lista_jugadores != []:
+        lista_copia = lista_jugadores[:]
+        
+        for estadistica in lista_copia[2]:
+            if estadistica == "promedio_puntos_por_partido":
+                quick_sort_key(lista_copia, estadistica, "asc")
+            
+        
+        
+        for jugador in lista_copia:
+            print("Nombre : {0} - Promedio de puntos por partido: {1}".format(jugador["nombre"], jugador["estadisticas"]["promedio_puntos_por_partido"]))    
+        
+        
+    else:
+        return -1
+    
+def miembro_salon_fama(lista_jugadores : list, nombre_jugador: str):
+    if lista_jugadores != []:
+        for jugador in lista_jugadores:
+            if nombre_jugador == jugador["nombre"]:
+            
+                    
+                    if "Miembro del Salon de la Fama del Baloncesto" in jugador["logros"]:
+                        print("{0} forma parte del salon de la fama".format(nombre_jugador))
+                        return True
+                    if "Miembro del Salon de la Fama del Baloncesto" not in jugador["logros"]:
+                        print("{0} no forma parte del salon de la fama".format(nombre_jugador))
+                        return False
+                    
+    else:
+        return -1
+
+
+def calcular_mostrar_jugador_mas_estadistica(lista_jugadores : list, key : str):
+    
+    if lista_jugadores != []:
+        
+        lista_copia = lista_jugadores[:]
+        jugador_mas_key = lista_jugadores[0]
+        
+        for jugador in lista_copia:
+            if jugador_mas_key["estadisticas"][key] < jugador["estadisticas"][key]:
+                jugador_mas_key = jugador
+                
+                
+        print("{0} - {1}".format(jugador_mas_key["nombre"], jugador_mas_key["estadisticas"][key]))
+        return jugador_mas_key
+                
+        
+        
+    else:
+        return -1
     
 
+
+def calcular_mostrar_jugador_mas_logros(lista_jugadores : list):
+    
+    if lista_jugadores != []:
+        
+        lista_copia = lista_jugadores[:]
+        jugador_mas_logros = lista_jugadores[0]
+        
+        for jugador in lista_copia:
+            if len(jugador_mas_logros["logros"]) < len(jugador["logros"]):
+                jugador_mas_logros = jugador
+                
+                
+        print("{0} - {1}".format(jugador_mas_logros["nombre"], jugador_mas_logros["logros"]))
+        return jugador_mas_logros
+                
+        
+        
+    else:
+        return -1
 def imprimir_menu_principal ():
     '''
     Imprime el menu principal
@@ -235,51 +307,39 @@ def parcial():
             case 4:
                 
                 pass
-            # case 5:
-                    
-            #         print("---Submenu---")
-            #         print("---¿Que archivo desea guardar?---")
-            #         print("1.Lista de juegos cuyo genero no contenga la palabra 'pelea'")
-            #         print("2.Lista de juego segun la decada elegida")
-            #         print("3.Lista de juegos ordenados por emperesa")
-            #         print("4.Lista de juegos de cada modo ")
-            #         print("0. SALIR")
-            #         opcion = int(input("Ingrese una opcion valida: "))
-            #         while opcion not in [0,1,2,3,4]:
-                        
-            #             opcion = int(input("Ingrese una opcion valida: "))
-                        
-            #         match opcion:
-            #             case 1:
-            #                     if flag1:
-            #                         pass
-            #                         #guardar_archivo_csv("C:/Users/Agustín/Dropbox/Mi PC (DESKTOP-DSJDI9V)/Desktop/Ejercicios Progra1/Modelo examen 1/juegos_no_pelea.csv", lista1)
-            #                     else:
-            #                         print("Primero debe generar la lista a guardar")
-            #             case 2:
-            #                     if flag2:
-            #                         pass
-            #                         #guardar_archivo_csv("C:/Users/Agustín/Dropbox/Mi PC (DESKTOP-DSJDI9V)/Desktop/Ejercicios Progra1/Modelo examen 1/juegos_decada_{}.csv".format(decada), lista2)
-            #                     else:
-                                    
-            #                         print("Primero debe generar la lista a guardar")
-            #             case 3:
-            #                     if flag3:
-            #                         pass
-            #                         #guardar_archivo_csv("C:/Users/Agustín/Dropbox/Mi PC (DESKTOP-DSJDI9V)/Desktop/Ejercicios Progra1/Modelo examen 1/juegos_ordenados_empresa_{}.csv".format(asc_desc), lista3)
-            #                     else:
-            #                         print("Primero debe generar la lista a guardar")
-            #             case 4:
-            #                     if flag4:
-            #                         pass
-            #                         #guardar_archivo_csv("C:/Users/Agustín/Dropbox/Mi PC (DESKTOP-DSJDI9V)/Desktop/Ejercicios Progra1/Modelo examen 1/juegos_modo_multijugador_cooperativo.csv", lista4)
-            #                     else:
-            #                         print("Primero debe generar la lista a guardar")
-            #             case 0:
-            #                     continue
-            #             case _:
-            #                     pass
+            case 5: 
+                calcular_mostrar_promedio_puntos_por_partido_equipo(lista_jugadores)
+            case 6:
+                mostrar_nombres_jugadores(lista_jugadores)
+                indice_ingresado = 0
+                indice_ingresado = int(input("Ingrese por favor el indice del jugador del que desea ver si forma parte del salon de la fama: "))
+                while not (validar_numero_rango(indice_ingresado, 1,12)):
+                    indice_ingresado = int(input("Ingrese por favor el indice del jugador del que desea ver si forma parte del salon de la fama: "))
                 
+                nombre_jugador = lista_jugadores[indice_ingresado-1]["nombre"]
+                miembro_salon_fama(lista_jugadores, nombre_jugador)
+            case 7:
+                calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "rebotes_totales")
+            case 8:
+                calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "porcentaje_tiros_de_campo")
+            case 9:
+                calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "asistencias_totales")
+            case 10:
+                pass
+            case 11:
+                pass
+            case 12:
+                pass
+            case 13:
+                calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "robos_totales")
+            case 14:
+                calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "bloqueos_totales")
+            case 15:
+                pass
+            case 16:
+                pass
+            case 17:
+                calcular_mostrar_jugador_mas_logros(lista_jugadores)
             case 0:
                 break
             case _:
