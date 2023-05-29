@@ -105,8 +105,45 @@ def quick_sort_key(lista : list, key : str, asc_desc : str):
     
     return lista_izquierda
 
-def validar_numero_rango(valor : str, valor_minimo : float, valor_maximo : float):
-    # Validar si el valor ingresado es un número
+
+def quick_sort_estadistica_key(lista : list, key : str , asc_desc : str):
+    '''
+    Ordena la lista de diccionarios segun la clave de estadisticas que recibe y el criterio ascendente o descendente
+    Recibe la lista de diccionarios a ordenar, la clave que va a utilizar para ordenar y el criterio asc o desc
+    Retorna una lista ordenada con los criterios elegidos
+    '''        
+    lista_derecha = []
+    lista_izquierda = []
+    
+    if (len(lista) <= 1):
+        return lista
+    else:
+        pivot = lista[0]
+        for elemento in lista[1:]:
+            if elemento["estadisticas"][key] > pivot["estadisticas"][key] and (asc_desc == "asc" or asc_desc == "mayor") \
+                or elemento["estadisticas"][key] < pivot["estadisticas"][key] and (asc_desc == "desc" or asc_desc == "menor") :
+                lista_derecha.append(elemento)
+            else:
+                lista_izquierda.append(elemento) 
+                
+    
+    
+    lista_izquierda = quick_sort_estadistica_key(lista_izquierda,key,asc_desc)
+    lista_izquierda.append(pivot)
+    lista_derecha = quick_sort_estadistica_key(lista_derecha,key,asc_desc)          
+    lista_izquierda.extend(lista_derecha)
+    
+    
+    return lista_izquierda
+
+
+def validar_numero_rango(valor : str, valor_minimo : float, valor_maximo : float) -> bool:
+    
+    '''
+    Valida que una cadena de texto ingresada por el usuario sea un numero y se encuentre dentro de un rango especifico
+    Recibe la cadena de texto del usuario, el valor minimo valido y el valor maximo valido (incluidos ambos)
+    Retorna True en caso de que la cadena sea un numero dentro del rango valido o false en caso contrario
+    '''
     
     if  re.match(r'(\d+(\.\d*)?|\.\d+)$', valor):
         
@@ -114,30 +151,49 @@ def validar_numero_rango(valor : str, valor_minimo : float, valor_maximo : float
         numero = float(valor)
     else:
         return False
-    # Verificar si el número está dentro del rango permitido
+    
     if numero >= valor_minimo and numero <= valor_maximo:
+        return True
+    else:
+        return False
+
+def validar_numero_menu(opcion : str) -> bool:
+    '''
+    Valida que el usuario ingrese una opcion valida del menu
+    Recibe la cadena de texto que representa la opcion elegida
+    Retorna True en caso de que la opcion sea valida o False en caso contrario
+    '''
+    patron = r"^(0|[1-9]|1[0-9]|20|23)$"
+    if re.match(patron, opcion):
         return True
     else:
         return False
     
     
-def mostrar_nombres_jugadores(lista_jugadores : list):
-    
+def mostrar_nombres_jugadores(lista_jugadores : list) -> bool:
+    '''
+    Muestra el nombre y posicion de cada uno de los jugadores de la lista de jugadores que forman parte de nuestro set de datos
+    Recibe la lista de jugadores a mostrar
+    Retorna True en caso de que la lista tenga informacion o falso en caso de que la lista este vacia
+    '''
     if lista_jugadores != []:
+        
         indice = 1
         for jugador in lista_jugadores:
             print("{0}.Nombre: {1} - Posicion: {2}".format(indice,jugador["nombre"], jugador["posicion"])) 
             indice +=1
-        
+        return True
     else:
         return False
 
 
 def mostrar_estadisticas_un_jugador(lista_jugadores : list, indice_ingresado : int):
+    '''
+    Muestra las estadisticas de un jugador en especifico elegido mediante un indice
+    Recibe la lista de jugadores y el indice ingresado por el usuario
+    Retorna True en caso de que la lista no este vacia o false en caso contrario
+    '''
     if lista_jugadores != []:
-        
-        
-
         
         for jugador in lista_jugadores:
             if jugador == lista_jugadores[indice_ingresado - 1]:
@@ -154,24 +210,31 @@ def mostrar_estadisticas_un_jugador(lista_jugadores : list, indice_ingresado : i
     
     
 def calcular_mostrar_promedio_puntos_por_partido_equipo(lista_jugadores : list):
-    
+    '''
+    Calcula y muestra a todos los jugadores ordenados segun el promedio de puntos por partido de manera ascendente
+    Recibe la lista de jugadores
+    Retorna True en caso de que la lista no este vacia o false en caso contrario
+    '''
     if lista_jugadores != []:
         lista_copia = lista_jugadores[:]
         
-        for estadistica in lista_copia[2]:
+        for estadistica in lista_copia["estadisticas"]:
             if estadistica == "promedio_puntos_por_partido":
                 quick_sort_key(lista_copia, estadistica, "asc")
             
-        
-        
         for jugador in lista_copia:
             print("Nombre : {0} - Promedio de puntos por partido: {1}".format(jugador["nombre"], jugador["estadisticas"]["promedio_puntos_por_partido"]))    
         
-        
+        return True
     else:
-        return -1
+        return False
     
-def miembro_salon_fama(lista_jugadores : list, jugador: dict):
+def miembro_salon_fama(lista_jugadores : list, jugador: dict) -> bool:
+    '''
+    Determina y muestra si un jugador es "Miembro del Salon de la Fama del Baloncesto"
+    Recibe la lista de jugadores y un diccionario que representa el jugador a evaluar
+    Retorna True en caso de que el jugador sea miembro o false en caso contrario, o si la lista esta vacia
+    '''
     if lista_jugadores != []:
         
             
@@ -183,11 +246,15 @@ def miembro_salon_fama(lista_jugadores : list, jugador: dict):
                         return False
                     
     else:
-        return -1
+        return False
 
 
-def calcular_mostrar_jugador_mas_estadistica(lista_jugadores : list, key : str):
-    
+def calcular_mostrar_jugador_mas_estadistica(lista_jugadores : list, key : str) -> dict:
+    '''
+    Calcula y muestra el jugador con el valor numerico mas alto en una estadistica especifica
+    Recibe la lista de jugadores y la clave de la estadistica a evaluar
+    Retorna el jugador con la estadistica mas alta o False en caso de que la lista este vacia
+    '''
     if lista_jugadores != []:
         
         lista_copia = lista_jugadores[:]
@@ -201,14 +268,17 @@ def calcular_mostrar_jugador_mas_estadistica(lista_jugadores : list, key : str):
         print("El jugador con mas {0} es {1} con {2} {3}".format(formatear_estadistica(key).lower(),jugador_mas_key["nombre"], jugador_mas_key["estadisticas"][key], formatear_estadistica(key).lower()))
         return jugador_mas_key
                 
-        
-        
     else:
-        return -1
+        return False
     
 
 
-def calcular_mostrar_jugador_mas_logros(lista_jugadores : list):
+def calcular_mostrar_jugador_mas_logros(lista_jugadores : list) -> dict:
+    '''
+    Calcula y muestra al jugador que posee mas logros, teniendo en cuenta los logros unicos y los acumulables
+    Recibe la lisat de jugadores
+    Retorna al jugador con mas logros o False en caso de que la lista este vacia 
+    '''
     
     if lista_jugadores != []:
         logros_jugadores = []
@@ -243,18 +313,19 @@ def calcular_mostrar_jugador_mas_logros(lista_jugadores : list):
         indice_jugador_mas_logros = logros_jugadores.index(numero_maximo) 
         jugador_mas_logros = lista_jugadores[indice_jugador_mas_logros]
         print("El jugador con mas logros es {0} con {1} logros".format(jugador_mas_logros["nombre"], numero_maximo))
-        return 1
+        return jugador_mas_logros
         
         
     else:
-        return -1
+        return False
     
 
-
-'''
-Permitir al usuario ingresar un valor y mostrar los jugadores que han promediado más puntos por partido que ese valor.'''
-
-def jugadores_mas_key_usuario(lista_jugadores : list, valor : int, key : str):
+def jugadores_mas_key_usuario(lista_jugadores : list, valor : float, key : str):
+    '''
+    Calcula y muestra aquellos jugadores que en una estadistica especifica tenga un valor mayor que el ingresado por el usuario
+    Recibe la lista de jugadores, el valor ingresado por el usuario y la clave de la estadistica a evaluar
+    Retorna True en caso de que la lista no este vacia o False en caso contrario
+    '''
     if lista_jugadores != []:
 
         lista_copia = lista_jugadores[:]
@@ -266,13 +337,17 @@ def jugadores_mas_key_usuario(lista_jugadores : list, valor : int, key : str):
                     print("{0} - {1} {2} - Posicion: {3}" .format(jugador["nombre"], estadistica, jugador["estadisticas"][key], jugador["posicion"]))
                 else:
                     print("{0} - {1} {2}".format(jugador["nombre"], estadistica, jugador["estadisticas"][key]))
-
+        return True
     else:
-        return -1
+        return False
 
 
-def jugador_mas_temporadas_jugadas(lista_jugadores : list):
-
+def calcular_mostrar_jugador_mas_temporadas_jugadas(lista_jugadores : list) -> dict:
+    '''
+    Calcula y muestra al jugador que tiene mas temporadas jugadas de la lista de jugadores
+    Recibe la lista de jugadores
+    Retorna al jugador con mas temporadas jugadas o False en caso de que la lista este vacia 
+    '''
 
     if lista_jugadores != []:
 
@@ -283,13 +358,19 @@ def jugador_mas_temporadas_jugadas(lista_jugadores : list):
                 jugador_mas_temporadas = jugador
 
         print("{0} es el jugador con mas temporadas jugadas, con un total de {1} temporadas".format(jugador["nombre"], jugador["estadisticas"]["temporadas"]))
-
+        return jugador_mas_temporadas
     else: 
-        return -1
+        return False
     
 
-def promedio_puntos_por_partido_equipo_sin_menor(lista_jugadores : list):
-
+def calcular_mostrar_promedio_puntos_por_partido_equipo_sin_menor(lista_jugadores : list):
+    '''
+    Calcula y muestra el promedio de puntos por partido de todo el equipo junto sin contar al jugador con menor valor
+    Recbie la lista de jugadores
+    Retorna el promedio obtenido o False en caso de que la lista este vacia
+    '''
+    
+    
     if lista_jugadores != []:
         lista_copia = lista_jugadores[:]
         jugador_menos_puntos = lista_copia[0]
@@ -313,22 +394,31 @@ def promedio_puntos_por_partido_equipo_sin_menor(lista_jugadores : list):
 
                 
     else:
-        return -1
+        return False
     
 
-def mostrar_logros_un_jugador(lista_jugadores : list, jugador):
-
+def mostrar_logros_un_jugador(lista_jugadores : list, jugador : dict) -> bool:
+    '''
+    Muestra los logros de un jugador en especifico
+    Recibe la lista de jugadores y un diccionario que representa al jugador
+    Retorna True en caso de que la lista no este vacia o False en caso contrario
+    '''
     if lista_jugadores != []:
         
         print("Logros de {0}:".format(jugador["nombre"]))
         for logro in jugador["logros"]:
             print("-",logro)
        
-    
+        return True
     else:
-        return -1
+        return False
     
-def validar_nombre(lista_jugadores : list, nombre_ingresado : str):
+def validar_nombre(lista_jugadores : list, nombre_ingresado : str) -> list:
+    '''
+    Valida que un nombre ingresado por el usuario coincida en al menos 4 caracteres seguidos con uno perteneciente a un jugador y agrega a una lista aquellos que lo hagan
+    Recibe la lista de jugadores y una cadena de texto del nombre ingresado por el usuario 
+    Retorna la lista con aquellos nombres que coincidan al menos 4 caracteres seguidos o False en caso de que la lista este vacia
+    '''
     
     if lista_jugadores != []:
         lista_copia = lista_jugadores[:]
@@ -343,10 +433,17 @@ def validar_nombre(lista_jugadores : list, nombre_ingresado : str):
                 
         return lista_resultado
         
-        
     else:
-        return -1
-def formatear_estadistica(estadistica : str):
+        return False
+    
+    
+    
+def formatear_estadistica(estadistica : str) -> str:
+    '''
+    Formatea las estadisticas, quitandoles el guión bajo y poniendo en mayuscula la primer letra
+    Recibe la cadena de texto de la estadistica a formatear
+    Retorna la cadena ya formateada
+    '''
     estadistica = estadistica.replace("_", " ").capitalize()
 
 
@@ -354,6 +451,11 @@ def formatear_estadistica(estadistica : str):
 
 
 def calcular_max_estadistica_key(lista_jugadores : list, key : str) -> float:
+    '''
+    Calcula el valor maximo de una estadistica en especifico
+    Recibe la lista de jugadores y la clave de la estadistica a evaluar 
+    Retorna un numero flotante que representa el valor maximo encontrado de esa estadistica
+    '''
     if lista_jugadores != []:
         
         maximo = lista_jugadores[0]["estadisticas"][key]
@@ -364,37 +466,85 @@ def calcular_max_estadistica_key(lista_jugadores : list, key : str) -> float:
         return float(maximo)       
         
     else: 
-        return -1
+        return False
     
-def quick_sort_estadistica_key(lista : list, key2 : str , asc_desc : str, key = "estadisticas"):
+
+def calcular_mostrar__guardar_ranking_jugadores(lista_jugadores : list):
     '''
-    Ordena una lista de diccionarios que recibe segun una clave y el criterio ascendente o descendente
-    Recibe la lista de diccionarios a ordenar, la clave que va a utilizar para ordenar y el criterio asc o desc
-    Retorna una lista ordenada con los criterios elegidos
-    '''        
-    lista_derecha = []
-    lista_izquierda = []
+    Calcula, muestra y guarda en un archivo.csv el ranking de cada jugador en los criterios puntos, rebotes, asistencias y robos
+    Recibe la lista de jugadores 
+    No retorna nada
+    '''
+    posicion_puntos = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "puntos_totales", "desc"))
+    posicion_rebotes = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "rebotes_totales", "desc"))
+    posicion_asistencias = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "asistencias_totales", "desc"))
+    posicion_robos = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "robos_totales", "desc"))
     
-    if (len(lista) <= 1):
-        return lista
-    else:
-        pivot = lista[0]
-        for elemento in lista[1:]:
-            if elemento[key][key2] > pivot[key][key2] and (asc_desc == "asc" or asc_desc == "mayor") \
-                or elemento[key][key2] < pivot[key][key2] and (asc_desc == "desc" or asc_desc == "menor") :
-                lista_derecha.append(elemento)
-            else:
-                lista_izquierda.append(elemento) 
-                
+    encabezado = imprimir_encabezado_23()
+    guardar_archivo_csv_rankings_encabezado(r"C:/Users/Agustín/Dropbox/Mi PC (DESKTOP-DSJDI9V)/Desktop/Ejercicios Progra1/parcial_1/pp_lab1_sande_agustin/archivos_csv/rankings.csv", encabezado)
+    for jugador in lista_jugadores:
+        print("{0:18} {1:10} {2:10} {3:10} {4:10}".format(jugador["nombre"], posicion_puntos[jugador["nombre"]], posicion_rebotes[jugador["nombre"]], posicion_asistencias[jugador["nombre"]], posicion_robos[jugador["nombre"]]))
+        guardar_archivo_csv_rankings(r"C:\Users\Agustín\Dropbox\Mi PC (DESKTOP-DSJDI9V)\Desktop\Ejercicios Progra1\parcial_1\pp_lab1_sande_agustin\archivos_csv\rankings.csv", "{0:18} {1:10} {2:10} {3:10} {4:10}".format(jugador["nombre"], posicion_puntos[jugador["nombre"]], posicion_rebotes[jugador["nombre"]], posicion_asistencias[jugador["nombre"]], posicion_robos[jugador["nombre"]]))
+
+def guardar_archivo_csv_rankings_encabezado(nombre_archivo : str, contenido : str):
+    '''
+    Crea o sobreescribe en el archivo .csv el encabezado de los criterios que va a guardar los rankings
+    Recibe el nombre del archivo que va a crear o sobreescribir y el contenido que va a escribir
+    Retorna True en caso de haber podido crear el archivo o False en caso contrario 
+    '''
+    try:
+        with open(nombre_archivo, "w", encoding= "utf-8") as archivo:
+            archivo.write(contenido)        
+            archivo.write("\n")   
+        return True
     
     
-    lista_izquierda = quick_sort_estadistica_key(lista_izquierda,key2,asc_desc)
-    lista_izquierda.append(pivot)
-    lista_derecha = quick_sort_estadistica_key(lista_derecha,key2,asc_desc)          
-    lista_izquierda.extend(lista_derecha)
+    except Exception as e:
+        print("Error al crear el archivo {}".format(nombre_archivo))
+        return False
+
+
+def guardar_archivo_csv_rankings(nombre_archivo : str, contenido : str):
+    '''
+    Anexa en el archivo .csv los rankings de cada jugador junto con su nombre
+    Recibe el nombre del archivo al que va a anexar informacion y el contenido que va a escribir
+    Retorna True en caso de haber podido anexar la informacion o False en caso contrario 
+    '''
+    try:
+        with open(nombre_archivo, "a", encoding= "utf-8") as archivo:
+            archivo.write(contenido)        
+            archivo.write("\n")   
+        return True
     
     
-    return lista_izquierda
+    except Exception as e:
+        print("Error al crear el archivo {}".format(nombre_archivo))
+        return False        
+
+def imprimir_encabezado_23() -> str:
+    '''
+    Imprime el encabezado de los criterios del punto 23
+    No recibe nada 
+    Retorna la cadena de texto del encabezado
+    '''
+    encabezado = "Jugador          -        Puntos - Rebotes - Asistencias - Robos "
+    print(encabezado)
+    return encabezado
+    
+    
+def ranking_jugadores(lista_ordenada):
+    '''
+    Crea un diccionario en donde guarda el nombre y la posicion en el ranking de cierto jugador de una lista ya ordenada previamente
+    Recibe la lista ya ordenada
+    Retorna el diccionario con el nombre de cada jugador como clave y la posicion en el ranking como valor
+    '''
+    posicion_ranking = {}
+    
+    for i, jugador in enumerate(lista_ordenada):
+            nombre = jugador["nombre"]
+            posicion_ranking[nombre] = i + 1    
+    
+    return posicion_ranking
 
 
 def imprimir_menu_principal ():
@@ -424,6 +574,7 @@ def imprimir_menu_principal ():
     print("18. Permitir al usuario ingresar un valor y mostrar los jugadores que hayan tenido un porcentaje de tiros triples superior a ese valor.")
     print("19. Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas")
     print("20. Permitir al usuario ingresar un valor y mostrar los jugadores , ordenados por posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior a ese valor.")
+    print("23. Calcular de cada jugador cuál es su posición en cada uno de los siguientes ranking: Puntos - Rebotes - Asistencias - Robos. Y exportar a CSV")
     print("0. SALIR")
     
    
@@ -440,8 +591,8 @@ def parcial():
         
         
         opcion = input("Ingrese una opcion: ")
-        while not validar_numero_rango(opcion, 0,20):
-            opcion = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (0-20): ")
+        while not validar_numero_menu(opcion):
+            opcion = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (0-20 o 23): ")
 
         match opcion:
             
@@ -538,7 +689,7 @@ def parcial():
                 lista_ordenada_key = quick_sort_estadistica_key(lista_jugadores, "porcentaje_tiros_libres", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "porcentaje_tiros_libres")
             case "16":
-                promedio_puntos_por_partido_equipo_sin_menor(lista_jugadores)
+                calcular_mostrar_promedio_puntos_por_partido_equipo_sin_menor(lista_jugadores)
             case "17":
                 calcular_mostrar_jugador_mas_logros(lista_jugadores)
                 
@@ -551,7 +702,7 @@ def parcial():
                 lista_ordenada_key = quick_sort_estadistica_key(lista_jugadores, "porcentaje_tiros_triples", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "porcentaje_tiros_triples")
             case "19":
-                jugador_mas_temporadas_jugadas(lista_jugadores)
+                calcular_mostrar_jugador_mas_temporadas_jugadas(lista_jugadores)
             case "20":
                 
                 maximo = calcular_max_estadistica_key(lista_jugadores, "porcentaje_tiros_de_campo")
@@ -560,15 +711,19 @@ def parcial():
                     valor = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (0-{0}): ".format(maximo))
                 lista_ordenada_key = quick_sort_key(lista_jugadores, "posicion", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "porcentaje_tiros_de_campo")
-            case "21":
-               pass 
+            case "23":
+                calcular_mostrar__guardar_ranking_jugadores(lista_jugadores)
+                
+              
+
             case "0":
                 break
             case _:
                 pass
         
         input("\nPulse enter para continuar\n")
-        
-        
+
+
+
 parcial()
 
