@@ -163,7 +163,7 @@ def validar_numero_menu(opcion : str) -> bool:
     Recibe la cadena de texto que representa la opcion elegida
     Retorna True en caso de que la opcion sea valida o False en caso contrario
     '''
-    patron = r"^(0|[1-9]|1[0-9]|20|23)$"
+    patron = r"^(0|[1-9]|1[0-9]|20|21|23)$"
     if re.match(patron, opcion):
         return True
     else:
@@ -574,14 +574,106 @@ def imprimir_menu_principal ():
     print("18. Permitir al usuario ingresar un valor y mostrar los jugadores que hayan tenido un porcentaje de tiros triples superior a ese valor.")
     print("19. Calcular y mostrar el jugador con la mayor cantidad de temporadas jugadas")
     print("20. Permitir al usuario ingresar un valor y mostrar los jugadores , ordenados por posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior a ese valor.")
+    print("21. Submenu Ejercicio extra")
     print("23. Calcular de cada jugador cuál es su posición en cada uno de los siguientes ranking: Puntos - Rebotes - Asistencias - Robos. Y exportar a CSV")
+    
     print("0. SALIR")
     
-   
+def imprimir_submenu_extra():
+    
+    print("1.Determinar la cantidad de jugadores que hay por cada posición.")
+    print("2.Mostrar la lista de jugadores ordenadas por la cantidad de All-Star de forma descendente")
+    print("3.Determinar qué jugador tiene las mejores estadísticas en cada valor.")
+    print("4.Determinar qué jugador tiene las mejores estadísticas de todos.")
+
+
+def cantidad_jugadores_posicion(lista_jugadores : list):
+    
+    if lista_jugadores != []:
+        
+        posiciones = {}
+        
+        for jugador in lista_jugadores:
+            if jugador["posicion"] not in posiciones:
+                
+                posiciones[jugador["posicion"]] = 1 
+            else:
+                posiciones[jugador["posicion"]] += 1
+        
+        return posiciones
+    else:
+        return False
+
+def imprimir_cantidad_jugadores_posicion(posiciones : dict) :
+    
+    for posicion in posiciones:
+        print("{0}:{1}".format(posicion, posiciones[posicion]))
+        
+
+
+def cantidad_all_star(lista_jugadores : list):
+    
+    if lista_jugadores != []:
+        lista_copia = lista_jugadores[:]
+        
+        lista = []
+        for jugador in lista_copia:
+            dict = {}
+            cantidad_allstar = 0
+            for logro in jugador["logros"]:
+                tiene_allstar = re.findall(r"([0-9]|1[0-9]) veces All-Star", logro)
+                if tiene_allstar:
+                    cantidad_allstar = int(tiene_allstar[0])
+
+            dict["nombre"] = jugador["nombre"]
+            dict["cantidad_all_star"] = int(cantidad_allstar)
+            lista.append(dict)
+            
+        
+        lista = quick_sort_key(lista, "cantidad_all_star", "desc")
+        for jugador in lista:
+            print("{0} ({1} veces All-Star)".format(jugador["nombre"], jugador["cantidad_all_star"]))
+        
+    else:
+        return False
+    
+    
+    
+    
+      
+      
+def calcular_jugador_max_estadistica_key(lista_jugadores : list, key : str) -> float:
+    '''
+    Calcula el jugador con el valor maximo de una estadistica en especifico
+    Recibe la lista de jugadores y la clave de la estadistica a evaluar 
+    Retorna un numero flotante que representa el valor maximo encontrado de esa estadistica
+    '''
+    if lista_jugadores != []:
+        
+        jugador_maximo = lista_jugadores[0]
+        for jugador in lista_jugadores:
+            if jugador["estadisticas"][key] > jugador_maximo["estadisticas"][key]:
+                jugador_maximo = jugador 
+                
+        return jugador_maximo      
+        
+    else: 
+        return False
+    
+    
+def mostrar_jugador_max_estadistica_key(lista_jugadores : list):
+    for estadistica in lista_jugadores[0]["estadisticas"].keys():
+                            
+        jugador_max = calcular_jugador_max_estadistica_key(lista_jugadores, estadistica)
+                            
+        print("Mayor cantidad de {0} : {1} ({2})".format(estadistica.replace("_", " ").lower(), jugador_max["nombre"], jugador_max["estadisticas"][estadistica] ))
+
+ 
+    
 def parcial():
+    
     lista_jugadores = leer_archivo_json(r"C:\Users\Agustín\Dropbox\Mi PC (DESKTOP-DSJDI9V)\Desktop\Ejercicios Progra1\parcial_1\pp_lab1_sande_agustin\data_parcial.json", "jugadores")
-    
-    
+     
     flag2 = False
     
     
@@ -589,10 +681,9 @@ def parcial():
         
         imprimir_menu_principal()
         
-        
         opcion = input("Ingrese una opcion: ")
         while not validar_numero_menu(opcion):
-            opcion = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (0-20 o 23): ")
+            opcion = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (0-21 o 23): ")
 
         match opcion:
             
@@ -646,12 +737,16 @@ def parcial():
                     
                     miembro_salon_fama(lista_jugadores, jugador)
             case "7":
+                
                 calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "rebotes_totales")
             case "8":
+                
                 calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "porcentaje_tiros_de_campo")
             case "9":
+                
                 calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "asistencias_totales")
             case "10":
+                
                 maximo = calcular_max_estadistica_key(lista_jugadores, "promedio_puntos_por_partido")
                 valor = input("Ingrese un numero entre 0 y {0} por favor: ".format(maximo))
                 
@@ -677,8 +772,10 @@ def parcial():
                 lista_ordenada_key = quick_sort_estadistica_key(lista_jugadores, "promedio_asistencias_por_partido", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "promedio_asistencias_por_partido")
             case "13":
+                
                 calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "robos_totales")
             case "14":
+                
                 calcular_mostrar_jugador_mas_estadistica(lista_jugadores, "bloqueos_totales")
             case "15":
                 
@@ -689,8 +786,10 @@ def parcial():
                 lista_ordenada_key = quick_sort_estadistica_key(lista_jugadores, "porcentaje_tiros_libres", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "porcentaje_tiros_libres")
             case "16":
+                
                 calcular_mostrar_promedio_puntos_por_partido_equipo_sin_menor(lista_jugadores)
             case "17":
+                
                 calcular_mostrar_jugador_mas_logros(lista_jugadores)
                 
             case "18":
@@ -702,6 +801,7 @@ def parcial():
                 lista_ordenada_key = quick_sort_estadistica_key(lista_jugadores, "porcentaje_tiros_triples", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "porcentaje_tiros_triples")
             case "19":
+                
                 calcular_mostrar_jugador_mas_temporadas_jugadas(lista_jugadores)
             case "20":
                 
@@ -711,11 +811,27 @@ def parcial():
                     valor = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (0-{0}): ".format(maximo))
                 lista_ordenada_key = quick_sort_key(lista_jugadores, "posicion", "desc")
                 jugadores_mas_key_usuario(lista_ordenada_key, float(valor), "porcentaje_tiros_de_campo")
+            case "21":
+                imprimir_submenu_extra()
+                
+                opcionSubmenu = input("Ingrese una opcion: ")
+                while not validar_numero_menu(opcion):
+                    opcionSubmenu = input("Numero ingresado no valido!\nIngrese una opcion valida por favor (1-4): ")
+                    
+                match opcionSubmenu:
+                    case "1":
+                        
+                        imprimir_cantidad_jugadores_posicion(cantidad_jugadores_posicion(lista_jugadores))
+                    case "2":
+                        cantidad_all_star(lista_jugadores)
+                    case "3":
+                        mostrar_jugador_max_estadistica_key(lista_jugadores)
+                    case "4":
+                        pass
             case "23":
+                
                 calcular_mostrar__guardar_ranking_jugadores(lista_jugadores)
                 
-              
-
             case "0":
                 break
             case _:
@@ -726,4 +842,3 @@ def parcial():
 
 
 parcial()
-
