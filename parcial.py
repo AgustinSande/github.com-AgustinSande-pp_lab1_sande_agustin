@@ -398,11 +398,13 @@ def calcular_mostrar_promedio_puntos_por_partido_equipo_sin_menor(lista_jugadore
     
 
 def mostrar_logros_un_jugador(lista_jugadores : list, jugador : dict) -> bool:
+    
     '''
     Muestra los logros de un jugador en especifico
     Recibe la lista de jugadores y un diccionario que representa al jugador
     Retorna True en caso de que la lista no este vacia o False en caso contrario
     '''
+    
     if lista_jugadores != []:
         
         print("Logros de {0}:".format(jugador["nombre"]))
@@ -479,13 +481,21 @@ def calcular_mostrar__guardar_ranking_jugadores(lista_jugadores : list):
     posicion_rebotes = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "rebotes_totales", "desc"))
     posicion_asistencias = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "asistencias_totales", "desc"))
     posicion_robos = ranking_jugadores(quick_sort_estadistica_key(lista_jugadores, "robos_totales", "desc"))
-    
+    lista_diccionarios = []
     encabezado = imprimir_encabezado_23()
     guardar_archivo_csv_rankings_encabezado(r"C:/Users/Agustín/Dropbox/Mi PC (DESKTOP-DSJDI9V)/Desktop/Ejercicios Progra1/parcial_1/pp_lab1_sande_agustin/archivos_csv/rankings.csv", encabezado)
     for jugador in lista_jugadores:
+        dict = {}
+        dict["nombre"] = jugador["nombre"]
+        dict["ranking"] = posicion_puntos[jugador["nombre"]] + posicion_rebotes[jugador["nombre"]] + posicion_asistencias[jugador["nombre"]] + posicion_robos[jugador["nombre"]]
         print("{0:18} {1:10} {2:10} {3:10} {4:10}".format(jugador["nombre"], posicion_puntos[jugador["nombre"]], posicion_rebotes[jugador["nombre"]], posicion_asistencias[jugador["nombre"]], posicion_robos[jugador["nombre"]]))
         guardar_archivo_csv_rankings(r"C:\Users\Agustín\Dropbox\Mi PC (DESKTOP-DSJDI9V)\Desktop\Ejercicios Progra1\parcial_1\pp_lab1_sande_agustin\archivos_csv\rankings.csv", "{0:18} {1:10} {2:10} {3:10} {4:10}".format(jugador["nombre"], posicion_puntos[jugador["nombre"]], posicion_rebotes[jugador["nombre"]], posicion_asistencias[jugador["nombre"]], posicion_robos[jugador["nombre"]]))
-
+        lista_diccionarios.append(dict)
+    
+    return lista_diccionarios
+        
+        
+        
 def guardar_archivo_csv_rankings_encabezado(nombre_archivo : str, contenido : str):
     '''
     Crea o sobreescribe en el archivo .csv el encabezado de los criterios que va a guardar los rankings
@@ -668,7 +678,8 @@ def mostrar_jugador_max_estadistica_key(lista_jugadores : list):
                             
         print("Mayor cantidad de {0} : {1} ({2})".format(estadistica.replace("_", " ").lower(), jugador_max["nombre"], jugador_max["estadisticas"][estadistica] ))
 
- 
+        
+        
     
 def parcial():
     
@@ -827,7 +838,9 @@ def parcial():
                     case "3":
                         mostrar_jugador_max_estadistica_key(lista_jugadores)
                     case "4":
-                        pass
+                        a = calcular_mostrar__guardar_ranking_jugadores(lista_jugadores)
+                        lista = quick_sort_key(a, "ranking", "asc")
+                        print("El jugador con el mejor ranking en conjunto es {0}".format(lista[0]["nombre"]))
             case "23":
                 
                 calcular_mostrar__guardar_ranking_jugadores(lista_jugadores)
